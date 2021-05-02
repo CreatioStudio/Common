@@ -1,4 +1,4 @@
-package vip.creatio.common;
+package vip.creatio.common.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;

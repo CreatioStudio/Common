@@ -1,4 +1,4 @@
-package vip.creatio.common;
+package vip.creatio.common.util;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;

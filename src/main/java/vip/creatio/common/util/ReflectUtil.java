@@ -1,4 +1,4 @@
-package vip.creatio.common;
+package vip.creatio.common.util;
 
 import java.lang.invoke.*;
 import java.lang.reflect.*;

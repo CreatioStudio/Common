@@ -1,4 +1,4 @@
-package vip.creatio.common;
+package vip.creatio.common.collection;
 
 import java.io.Serializable;
 import java.util.Map;
