@@ -85,6 +85,9 @@ public final class Mth {
         }
     }
 
+    public static int floorDiv(int src, int div) {
+        return src / div;
+    }
 
     public static int floor(float val) {
         int var = (int)val;
@@ -110,6 +113,10 @@ public final class Mth {
         return Math.abs(value);
     }
 
+
+    public static int ceilDiv(int src, int div) {
+        return src / div + ((src % div > 0) ? 1 : 0);
+    }
 
     public static int ceil(final float value) {
         int v = (int) value;

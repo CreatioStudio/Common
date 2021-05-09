@@ -1,9 +1,8 @@
 package vip.creatio.common.util;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import vip.creatio.common.collection.Pair;
+
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class StringUtil {
@@ -105,6 +104,139 @@ public class StringUtil {
             if (i == raw.length() - 1) s.add(raw.substring(last, i + 1).trim());
         }
         return s;
+    }
+
+    public static String[] split(String src) {
+        return split(src, " \t\n\r\f", '"', false);
+    }
+
+    public static String[] split(String src, boolean keepQuote) {
+        return split(src, " \t\n\r\f", '"', keepQuote);
+    }
+
+    public static String[] split(String src, String delim, char quote, boolean keepQuote) {
+        if (src.length() == 0) return new String[0];
+        char[] chars = src.toCharArray();
+        char[] dchars = delim.toCharArray();
+        int last = 0;
+        boolean quoted = false;
+        List<String> list = new ArrayList<>();
+        OUTER:
+        for (int i = 0; i < chars.length; i++) {
+            if (chars[i] == quote) {
+                if (quoted) {
+                    quoted = false;
+                    if (i == last) {
+                        last = -1;
+                        continue;
+                    }
+                    String text = new String(chars, last, i - last + (keepQuote ? 1 : 0));
+                    last = -1;
+                    list.add(text);
+                } else {
+                    quoted = true;
+                    last = i + (keepQuote ? 0 : 1);
+                }
+            } else if (!quoted) {
+                for (char d : dchars) {
+                    if (chars[i] == d) {
+                        if (i == last) {
+                            last = i + 1;
+                            continue OUTER;
+                        }
+                        if (last > -1) {
+                            String text = new String(chars, last, i - last);
+                            list.add(text);
+                        }
+                        last = i + 1;
+                        continue OUTER;
+                    }
+                }
+            }
+        }
+        if (last > -1 )list.add(new String(chars, last, chars.length - last));
+        return list.toArray(new String[0]);
+    }
+
+    public static IndexPair<String>[] indexSplit(String src) {
+        return indexSplit(src, " \t\n\r\f", '"', false);
+    }
+
+    public static IndexPair<String>[] indexSplit(String src, boolean keepQuote) {
+        return indexSplit(src, " \t\n\r\f", '"', keepQuote);
+    }
+
+    /**
+     * Split the string but record split offset to a IndexPair
+     */
+    @SuppressWarnings("unchecked")
+    public static IndexPair<String>[] indexSplit(String src, String delim, char quote, boolean keepQuote) {
+        if (src.length() == 0) return new IndexPair[0];
+        char[] chars = src.toCharArray();
+        char[] dchars = delim.toCharArray();
+        int last = 0;
+        boolean quoted = false;
+        List<IndexPair<String>> list = new ArrayList<>();
+        OUTER:
+        for (int i = 0; i < chars.length; i++) {
+            if (chars[i] == quote) {
+                if (quoted) {
+                    quoted = false;
+                    if (i == last) {
+                        last = -1;
+                        continue;
+                    }
+                    String text = new String(chars, last, i - last + (keepQuote ? 1 : 0));
+                    list.add(new IndexPair<>(last, text));
+                    last = -1;
+                } else {
+                    quoted = true;
+                    last = i + (keepQuote ? 0 : 1);
+                }
+            } else if (!quoted) {
+                for (char d : dchars) {
+                    if (chars[i] == d) {
+                        if (i == last) {
+                            last = i + 1;
+                            continue OUTER;
+                        }
+                        if (last > -1) {
+                            String text = new String(chars, last, i - last);
+                            list.add(new IndexPair<>(last, text));
+                        }
+                        last = i + 1;
+                        continue OUTER;
+                    }
+                }
+            }
+        }
+        if (last > -1 )list.add(new IndexPair<>(last, new String(chars, last, chars.length - last)));
+        return list.toArray(new IndexPair[0]);
+    }
+
+    public static String readString(String src, int index) {
+        if (src.equals("\"") || src.equals("\"\"")) return "";
+        char[] chars = src.toCharArray();
+        if (chars.length == 0) return "";
+        if (chars.length <= index) throw new StringIndexOutOfBoundsException(index);
+        boolean quoted = false;
+        for (int i = index; i < chars.length; i++) {
+            if (chars[i] == '"') {
+                if (quoted) {
+                    return src.substring(index, i).trim();
+                } else {
+                    quoted = true;
+                    index = i + 1;
+                }
+            } else if (!quoted && chars[i] == ' ') {
+                return src.substring(index, i).trim();
+            }
+        }
+        return src.substring(index).trim();
+    }
+
+    public static String readString(String src) {
+        return readString(src, 0);
     }
 
     /**
@@ -342,51 +474,56 @@ public class StringUtil {
         return src;
     }
 
-    public static String toRomanNumber(int num) {
-        StringBuilder sb = new StringBuilder();
-        if (num == 0) return "0";
-        while (num != 0) {
-            if (num >= 1000) {
-                sb.append("M");
-                num -= 1000;
-            } else if (num >= 900) {
-                sb.append("CM");
-                num -= 900;
-            } else if (num >= 500) {
-                sb.append("D");
-                num -= 500;
-            } else if (num >= 400) {
-                sb.append("CD");
-                num -= 400;
-            } else if (num >= 100) {
-                sb.append("C");
-                num -= 100;
-            } else if (num >= 90) {
-                sb.append("XC");
-                num -= 90;
-            } else if (num >= 50) {
-                sb.append("L");
-                num -= 50;
-            } else if (num >= 40) {
-                sb.append("XL");
-                num -= 40;
-            } else if (num >= 10) {
-                sb.append("X");
-                num -= 10;
-            } else if (num >= 9) {
-                sb.append("IX");
-                num -= 9;
-            } else if (num >= 5) {
-                sb.append("V");
-                num -= 5;
-            } else if       (num >= 4) {
-                sb.append("IV");
-                num -= 4;
-            } else if (num >= 1) {
-                sb.append("I");
-                num -= 1;
+    /**
+     * Test if a string is made with specific chars
+     */
+    public static boolean containsOnly(String src, String chars) {
+        char[] srcC = src.toCharArray();
+        char[] charsC = chars.toCharArray();
+
+        OUTER:
+        for (char value : srcC) {
+            for (char c : charsC) {
+                if (value == c) continue OUTER;
+            }
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean containsNone(String src, String chars) {
+        char[] srcC = src.toCharArray();
+        char[] charsC = chars.toCharArray();
+
+        for (char c : srcC) {
+            for (char value : charsC) {
+                if (c == value) return false;
             }
         }
-        return sb.toString();
+        return true;
     }
+
+    public static boolean containsAll(String src, String chars) {
+        char[] srcC = src.toCharArray();
+        char[] charsC = chars.toCharArray();
+        boolean[] contained = new boolean[charsC.length];
+
+        for (char c : srcC) {
+            for (int i = 0; i < charsC.length; i++) {
+                if (!contained[i]) {
+                    if (c == charsC[i]) contained[i] = true;
+                }
+            }
+        }
+
+        for (boolean b : contained) {
+            if (!b) return false;
+        }
+        return true;
+    }
+
+    public static boolean containsAny(String src, String chars) {
+        return !containsNone(src, chars);
+    }
+
 }

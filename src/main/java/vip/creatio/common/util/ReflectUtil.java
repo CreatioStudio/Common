@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 
 public final class ReflectUtil {
 
+    public static final String CLASSNAME_ILLEGAL_CHARS = " '[]{}()-+=;,`~!@#%^&*";
+
     public static Class<?> toWrapper(Class<?> primitive) {
         if (primitive.isPrimitive()) {
             switch (primitive.getName()) {

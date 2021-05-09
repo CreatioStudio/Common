@@ -2,8 +2,10 @@ package vip.creatio.common.util;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.IntFunction;
 
 /**
  * Array Utilities, for faster array processing.
@@ -169,5 +171,75 @@ public class ArrayUtil {
             list.add(j);
         }
         return list;
+    }
+
+    public static <T> List<T> flat(List<T[]> list) {
+        return flat(list, new ArrayList<>());
+    }
+
+    public static <T> T[] flatToArray(List<T[]> list, IntFunction<T[]> array) {
+        List<T> l = flat(list);
+        return l.toArray(array.apply(l.size()));
+    }
+
+    public static <T, S extends List<T>> S flat(List<T[]> list, S container) {
+        for (T[] t : list) {
+            container.addAll(Arrays.asList(t));
+        }
+        return container;
+    }
+
+    public static List<Integer> flatInt(List<int[]> list) {
+        return flatInt(list, new ArrayList<>());
+    }
+
+    public static <S extends List<Integer>> S flatInt(List<int[]> list, S container) {
+        for (int[] t : list) {
+            for (int i : t) {
+                container.add(i);
+            }
+        }
+        return container;
+    }
+
+    public static int[] flatToIntArray(List<int[]> list) {
+        List<Integer> l = flatInt(list);
+        return toIntArray(l);
+    }
+
+    public static List<Long> flatLong(List<long[]> list) {
+        return flatLong(list, new ArrayList<>());
+    }
+
+    public static <S extends List<Long>> S flatLong(List<long[]> list, S container) {
+        for (long[] t : list) {
+            for (long i : t) {
+                container.add(i);
+            }
+        }
+        return container;
+    }
+
+    public static long[] flatToLongArray(List<long[]> list) {
+        List<Long> l = flatLong(list);
+        return toLongArray(l);
+    }
+
+    public static List<Double> flatDouble(List<double[]> list) {
+        return flatDouble(list, new ArrayList<>());
+    }
+
+    public static <S extends List<Double>> S flatDouble(List<double[]> list, S container) {
+        for (double[] t : list) {
+            for (double i : t) {
+                container.add(i);
+            }
+        }
+        return container;
+    }
+
+    public static double[] flatToDoubleArray(List<double[]> list) {
+        List<Double> l = flatDouble(list);
+        return toDoubleArray(l);
     }
 }
